@@ -1,0 +1,7 @@
+C:\Users\user\source\repos\YourWarServer\YourWarServer\bin\Debug\YourWarServer.exe.config
+C:\Users\user\source\repos\YourWarServer\YourWarServer\bin\Debug\YourWarServer.exe
+C:\Users\user\source\repos\YourWarServer\YourWarServer\bin\Debug\YourWarServer.pdb
+C:\Users\user\source\repos\YourWarServer\YourWarServer\obj\Debug\YourWarServer.csproj.AssemblyReference.cache
+C:\Users\user\source\repos\YourWarServer\YourWarServer\obj\Debug\YourWarServer.csproj.CoreCompileInputs.cache
+C:\Users\user\source\repos\YourWarServer\YourWarServer\obj\Debug\YourWarServer.exe
+C:\Users\user\source\repos\YourWarServer\YourWarServer\obj\Debug\YourWarServer.pdb
