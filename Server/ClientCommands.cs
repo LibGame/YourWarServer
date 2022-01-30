@@ -377,12 +377,12 @@ namespace YourWarServer.Server
                     {
                         var bytes = _usersDataBase.GetBytesByLogin(commandAndMessages.Messages[0], "Icon");
                         Console.WriteLine(bytes.Length);
-                        _messangerSender.SendBytes(bytes, handler);
+                        _messangerSender.SendMessage(bytes, handler);
                     }
                     catch
                     {
                         var bytes = new byte[0];
-                        _messangerSender.SendBytes(bytes, handler);
+                        _messangerSender.SendMessage(bytes, handler);
 
                     }
                     return true;

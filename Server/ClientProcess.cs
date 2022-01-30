@@ -128,36 +128,71 @@ namespace YourWarServer.Server
 
                     if (_isNextImage)
                     {
-                        byte[] buffer = new byte[100000];
 
-                        int byte_count = stream.Read(buffer, 0, buffer.Length);
-                        Console.WriteLine("byte_count " + byte_count);
-                        if (byte_count == 3)
+                        Encoding utf8 = new UTF8Encoding(false);
+                        long length;
+                        using (BinaryReader br = new BinaryReader(stream, utf8, true))
                         {
-                            AddToData(_bytes.ToArray());
-                            _isNextImage = false;
-                            _length = 0;
-                            _bytes.Clear();
-                            Console.WriteLine("Отправили end");
-                            clientCommands.MessangerSender.SendMessage("end", client);
+                            length = br.ReadInt64();
                         }
-                        else
+
+                        using (var fs = new MemoryStream())
                         {
-                            _bytes.AddRange(buffer);
+                            byte[] buffer = new byte[1024];
+                            long received = 0;
+                            while (received < length)
+                            {
+                                int toReceive = (int)Math.Min(buffer.Length, length - received);
+                                int bytesReceived = stream.Read(buffer, 0, toReceive);
+                                if (bytesReceived == 0) // Неожиданный конец потока
+                                    return;
+                                received += bytesReceived;
+                                fs.Write(buffer, 0, bytesReceived);
+                            }
+                            data = Encoding.UTF8.GetString(fs.ToArray(), 0, (int)received);
+                            AddToData(fs.ToArray());
+                            _isNextImage = false;
+
+                            clientCommands.MessangerSender.SendMessage("end", client);
                         }
                     }
                     else
                     {
-                        byte[] buffer = new byte[100000];
-                        int byte_count;
-
-                        byte_count = stream.Read(buffer, 0, buffer.Length);
-                        data = Encoding.UTF8.GetString(buffer, 0, byte_count);
-                        if (byte_count > 0)
+                        Encoding utf8 = new UTF8Encoding(false);
+                        long length;
+                        using (BinaryReader br = new BinaryReader(stream, utf8, true))
                         {
-                            CommandAndMessages commandAndMessages = GetReciveCommandAndMessage(data);
-                            clientCommands.UseCommand(commandAndMessages, client);
+                            length = br.ReadInt64();
                         }
+
+                        using (var fs = new MemoryStream())
+                        {
+                            byte[] buffer = new byte[1024];
+                            long received = 0;
+                            while (received < length)
+                            {
+                                int toReceive = (int)Math.Min(buffer.Length, length - received);
+                                int bytesReceived = stream.Read(buffer, 0, toReceive);
+                                if (bytesReceived == 0) // Неожиданный конец потока
+                                    return;
+                                received += bytesReceived;
+                                fs.Write(buffer, 0, bytesReceived);
+                            }
+                            data  = Encoding.UTF8.GetString(fs.ToArray(), 0, (int)received);
+                            Console.WriteLine("Data " + data);
+                            if ((int)received > 0)
+                            {
+                                CommandAndMessages commandAndMessages = GetReciveCommandAndMessage(data);
+                                clientCommands.UseCommand(commandAndMessages, client);
+                            }
+                        }
+
+                        //byte[] buffer = new byte[100000];
+                        //int byte_count;
+
+                        //byte_count = stream.Read(buffer, 0, buffer.Length);
+                        //data = Encoding.UTF8.GetString(buffer, 0, byte_count);
+
                     }
                 }
                 catch (Exception e)
@@ -175,6 +210,11 @@ namespace YourWarServer.Server
             Console.WriteLine("Вышел");
             client.Client.Shutdown(SocketShutdown.Both);
             client.Close();
+        }
+
+        private void ReceiveFile(Stream stream)
+        {
+
         }
 
         private static bool IsEnd(byte[] buffer)

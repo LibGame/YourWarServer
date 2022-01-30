@@ -15,7 +15,39 @@ namespace YourWarServer.Server
         {
             byte[] buffer = Encoding.UTF8.GetBytes(message);
             NetworkStream stream = tcpClient.GetStream();
-            stream.Write(buffer, 0, buffer.Length);
+            //stream.Write(buffer, 0, buffer.Length);
+
+            long length = buffer.Length; // длина файла в байтах
+            Encoding utf8 = new UTF8Encoding(false); // UTF-8 без BOM, самый стандартный стандарт из всех стандартов
+            using (BinaryWriter bw = new BinaryWriter(stream, utf8, true))
+            {
+                bw.Write(length);
+            }
+
+            using (var fs = new MemoryStream(buffer))
+            {
+                Console.WriteLine("sending " + buffer.Length);
+                fs.CopyTo(stream);
+            }
+        }
+
+        public void SendMessage(byte[] bytes, TcpClient tcpClient)
+        {
+            NetworkStream stream = tcpClient.GetStream();
+            //stream.Write(buffer, 0, buffer.Length);
+
+            long length = bytes.Length; // длина файла в байтах
+            Encoding utf8 = new UTF8Encoding(false); // UTF-8 без BOM, самый стандартный стандарт из всех стандартов
+            using (BinaryWriter bw = new BinaryWriter(stream, utf8, true))
+            {
+                bw.Write(length);
+            }
+
+            using (var fs = new MemoryStream(bytes))
+            {
+                Console.WriteLine("sending " + bytes.Length);
+                fs.CopyTo(stream);
+            }
         }
 
         public void SendBytes(byte[] bytes, TcpClient tcpClient)
